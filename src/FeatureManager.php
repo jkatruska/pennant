@@ -7,6 +7,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Laravel\Pennant\Contracts\ScopeIdentifier;
 use Laravel\Pennant\Drivers\ArrayDriver;
 use Laravel\Pennant\Drivers\DatabaseDriver;
 use Laravel\Pennant\Drivers\Decorator;
@@ -188,7 +189,8 @@ class FeatureManager
             is_numeric($scope) => (string) $scope,
             $scope instanceof Model && $this->useMorphMap => $scope->getMorphClass().'|'.$scope->getKey(),
             $scope instanceof Model && ! $this->useMorphMap => $scope::class.'|'.$scope->getKey(),
-            default => throw new RuntimeException('Unable to serialize the feature scope to a string. You should implement the FeatureScopeable contract.')
+            $scope instanceof ScopeIdentifier => $scope->getScopeIdentifier(),
+            default => throw new RuntimeException('Unable to serialize the feature scope to a string. You should implement the FeatureScopeable or ScopeIdentifier contract.')
         };
     }
 
